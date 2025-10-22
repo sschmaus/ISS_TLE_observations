@@ -15,64 +15,109 @@ image_csv = dirname / "image_list.csv"
 images_table = pd.read_csv(image_csv).to_dict(orient="records")
 
 
+class ImageID:
+    """Class to generate URLs and filenames for ISS images."""
+
+    def __init__(self, img_id):
+        """Initialize with img_id in format 'mission-roll-frame'."""
+        self.img_id = img_id
+        self.mission, self.roll, self.frame = img_id.split("-")
+
+    def __str__(self):
+        return self.img_id
+
+    @property
+    def listing(self):
+        return f"https://eol.jsc.nasa.gov/SearchPhotos/photo.pl?mission={self.mission}&roll={self.roll}&frame={self.frame}"
+
+    @property
+    def thumbnail(self):
+        return f"https://eol.jsc.nasa.gov/DatabaseImages/ESC/small/{self.mission}/{self.mission}-{self.roll}-{self.frame}.JPG"
+
+    @property
+    def fullres(self):
+        return f"https://eol.jsc.nasa.gov/DatabaseImages/ESC/large/{self.mission}/{self.mission}-{self.roll}-{self.frame}.JPG"
+
+    @property
+    def nefname(self):
+        if int(self.mission[3:]) < 73:
+            return f"{self.mission.lower()}{self.roll.lower()}{self.frame.zfill(6)}.NEF"
+        else:
+            return f"{self.mission.lower()}{self.roll.lower()}{self.frame.zfill(7)}.NEF"
+
+    @property
+    def jpgname(self):
+        return f"{self.img_id}.JPG".upper()
+
+    @property
+    def raw_request(self):
+        return f"https://eol.jsc.nasa.gov/SearchPhotos/RequestOriginalImage.pl?mission={self.mission.upper()}&roll={self.roll}&frame={self.frame.zfill(6)}&file={self.nefname}"
+
+
 image_list = []
 
 for line in images_table:
-    
     # iss029e037312.nef
-    img_id = line["img_id"]   # Get the filename without extension and convert to uppercase
-    mission, roll, frame = img_id.split("-")    
+    img_id = ImageID(
+        line["img_id"]
+    )  # Get the filename without extension and convert to uppercase
+
     types = line["type_of_tle"].split(" ")
     astronaut = line["astronaut"]
 
-    listing = f"https://eol.jsc.nasa.gov/SearchPhotos/photo.pl?mission={mission}&roll={roll}&frame={frame}"
-    thumbnail = f"https://eol.jsc.nasa.gov/DatabaseImages/ESC/small/{mission}/{mission}-{roll}-{frame}.JPG"
-    fullres = f"https://eol.jsc.nasa.gov/DatabaseImages/ESC/large/{mission}/{mission}-{roll}-{frame}.JPG"
-    if int(mission[3:]) < 73:
-        nefname = f"{mission.lower()}{roll.lower()}{frame.zfill(6)}.NEF"
-    else:
-        nefname = f"{mission.lower()}{roll.lower()}{frame.zfill(7)}.NEF"
-
-    raw_request = f"https://eol.jsc.nasa.gov/SearchPhotos/RequestOriginalImage.pl?mission={mission.upper()}&roll={roll}&frame={frame.zfill(6)}&file={nefname}"
+    # listing = img_id.listing
+    # thumbnail = img_id.thumbnail
+    # fullres = img_id.fullres
+    # nefname = img_id.nefname
+    # raw_request = img_id.raw_request
 
     # download thumbnail if not already present
-    thumb_path = Path(f"thumbnails/{mission}-{roll}-{frame}.jpg")
+    thumb_path = Path(f"thumbnails/unprocessed/{img_id}.JPG")
     if not thumb_path.exists():
         # download_thumbnail(thumbnail)
-        fname = thumbnail.split("/")[-1]
+        fname = img_id.thumbnail.split("/")[-1]
 
-        #download thumbnail
+        # download thumbnail
         # reuse a single Session with browser-like headers and retries
         if "session" not in globals():
-
             session = requests.Session()
-            session.headers.update({
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36",
-                "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
-            })
-            retries = Retry(total=3, backoff_factor=0.3, status_forcelist=[429, 500, 502, 503, 504])
+            session.headers.update(
+                {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36",
+                    "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
+                }
+            )
+            retries = Retry(
+                total=3, backoff_factor=0.3, status_forcelist=[429, 500, 502, 503, 504]
+            )
             adapter = HTTPAdapter(max_retries=retries)
             session.mount("https://", adapter)
             session.mount("http://", adapter)
 
-        Path("thumbnails").mkdir(parents=True, exist_ok=True)
-        resp = session.get(thumbnail, headers={"Referer": listing}, timeout=10)
+        Path("thumbnails/unprocessed/").mkdir(parents=True, exist_ok=True)
+        resp = session.get(
+            img_id.thumbnail, headers={"Referer": img_id.listing}, timeout=10
+        )
         if resp.ok:
-            with open(f"thumbnails/{fname}", "wb") as f:
+            with open(f"thumbnails/unprocessed/{fname}", "wb") as f:
                 f.write(resp.content)
             print(f"Downloaded thumbnail for {fname}")
         else:
-            print(f"Warning: failed to download {thumbnail} (status {resp.status_code})")
+            print(
+                f"Warning: failed to download {img_id.thumbnail} (status {resp.status_code})"
+            )
 
-    image_list.append({
-        "img_id": f"{mission}-{roll}-{frame}",
-        "astronaut": astronaut,
-        "types": (" ").join(types),
-        "listing": listing,
-        "thumbnail": thumbnail,
-        "fullres": fullres,
-        "raw_request": raw_request,
-    })
+    image_list.append(
+        {
+            "img_id": img_id.__str__(),
+            "astronaut": astronaut,
+            "types": (" ").join(types),
+            "listing": img_id.listing,
+            "thumbnail": img_id.thumbnail,
+            "fullres": img_id.fullres,
+            "raw_request": img_id.raw_request,
+        }
+    )
 
 
 # save image list as csv
@@ -86,14 +131,23 @@ with open(dirname.parent / "README.md", "w", encoding="utf-8") as f:
     with open(template_path, "r", encoding="utf-8") as tf:
         template = tf.read().rstrip()
         f.write(template + "\n\n")
-    f.write("| Image ID | Thumbnail | Info | Download |\n")
-    f.write("|----------|-----------|------|----------|\n")
+    f.write("| Image ID | Processed crop | Processed preview | Info | Download |\n")
+    f.write("|----------|----------------|-------------------|------|----------|\n")
     for item in image_list:
-        img_id = item["img_id"]
-        listing = item["listing"]
-        thumbnail = item["thumbnail"]
-        fullres = item["fullres"]
-        raw_request = item["raw_request"]
+        img_id = ImageID(item["img_id"])
         types = item["types"].split(" ")
         astronaut = item["astronaut"] if not pd.isna(item["astronaut"]) else "*Unknown*"
-        f.write(f"| [{img_id}]({listing}) | [<img src=\"{thumbnail}\" width=\"300px\"/>]({listing}) | TLE Type: {', '.join(types)} <br/><br/> Astronaut: {astronaut} | [Full resolution]({fullres}) <br/><br/> [Request Raw]({raw_request}) |\n")
+
+        preview_crop = f"thumbnails/crop/{img_id.nefname.replace('.NEF', '.JPG')}"
+        preview_edit = f"thumbnails/edit/{img_id.nefname.replace('.NEF', '.JPG')}"
+
+        #check if preview files exist
+        if not Path(preview_crop).exists() or not Path(preview_edit).exists():
+            print(f"Warning: preview files for {img_id} do not exist, please export them from Lightroom.")
+        f.write(
+            f'| [{img_id}]({img_id.listing}) '\
+            f'| [<img src="{preview_crop}" width="200px"/>]({img_id.listing}) ' \
+            f'| [<img src="{preview_edit}" width="300px"/>]({img_id.listing}) ' \
+            f'| TLE Type: {", ".join(types)} <br/><br/> Astronaut: {astronaut} ' \
+            f'| [Full resolution]({img_id.fullres}) <br/><br/> [Request Raw]({img_id.raw_request}) |\n'
+        )
