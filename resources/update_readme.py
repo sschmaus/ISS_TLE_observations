@@ -138,8 +138,8 @@ with open(dirname.parent / "README.md", "w", encoding="utf-8") as f:
         types = item["types"].split(" ")
         astronaut = item["astronaut"] if not pd.isna(item["astronaut"]) else "*Unknown*"
 
-        preview_crop = f"thumbnails/crop/{img_id.nefname.replace('.NEF', '.JPG')}"
-        preview_edit = f"thumbnails/edit/{img_id.nefname.replace('.NEF', '.JPG')}"
+        preview_crop = f"thumbnails/crop/{img_id.nefname.replace('.NEF', '.jpg')}"
+        preview_edit = f"thumbnails/edit/{img_id.nefname.replace('.NEF', '.jpg')}"
 
         #check if preview files exist
         if not Path(preview_crop).exists() or not Path(preview_edit).exists():
