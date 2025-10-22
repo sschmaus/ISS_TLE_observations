@@ -7,11 +7,10 @@ This repo contains a list of images showing Transient [Luminous Events (TLEs)](h
 All images in this repository were processed with Adobe Lightroom with very similar settings to make them more appealing to look at, but still keep a very consistent appearance:
 
 * Color profile: `Adobe Color`
-* Whitebalance set to `Daylight` or moonlit clouds in the scene
-* `Exposure`, `Shadows`, `Highlights`, etc. slightly adjusted to bring out all details
-* Noise reduction: Lightroom `Enhance (AI) denoise` at 10-20% strength, sometimes additional traditional denoise
-* Lens corrections: Vignette correction, *No* distortion correction (causes fringes on noisy images)
-* sometimes cropping to reframce the TLE
+* Whitebalance set to `Daylight` or alternatively moonlit clouds in the scene
+* `Exposure`, `Shadows`, `Highlights`, etc. slightly adjusted to show fully dynamic range
+* Noise reduction: [Lightroom AI denoise](https://blog.adobe.com/en/publish/2023/04/18/denoise-demystified) at 10-20% strength, sometimes also traditional denoise
+* Lens corrections: Vignette correction, No distortion correction (causes fringes on noisy images)
 
 ## Attribution
 
@@ -25,7 +24,7 @@ Reprocessed images from this repository or the Flickr album should additionally 
 If you find TLE images on https://eol.jsc.nasa.gov which are not yet on the list, you can contribute them in two ways:
 
 * Send me a message on [Bluesky](https://bsky.app/profile/stim3on.bsky.social) or [Mastodon](https://fosstodon.org/@stim3on)
-* Open an [Issue](https://github.com/sschmaus/ISS_TLE_observations/issues/new/choose) with the NASA image id or link
+* Open an [Issue](https://github.com/sschmaus/ISS_TLE_observations/issues/new?title=New%20TLE%20observation&body=The%20following%20Astronaut%20image[s]%20contain%20TLEs,%20please%20add%20them%20to%20the%20repository:) with the NASA image id or link
 
 ## Table of observations
 

@@ -131,23 +131,23 @@ with open(dirname.parent / "README.md", "w", encoding="utf-8") as f:
     with open(template_path, "r", encoding="utf-8") as tf:
         template = tf.read().rstrip()
         f.write(template + "\n\n")
-    f.write("| Image ID | Processed crop | Processed preview | Info | Download |\n")
-    f.write("|----------|----------------|-------------------|------|----------|\n")
+    f.write("| Photo Number | Processed crop | Processed full | Info | Download |\n")
+    f.write("|--------------|----------------|----------------|------|----------|\n")
     for item in image_list:
         img_id = ImageID(item["img_id"])
         types = item["types"].split(" ")
         astronaut = item["astronaut"] if not pd.isna(item["astronaut"]) else "*Unknown*"
 
         preview_crop = f"thumbnails/crop/{img_id.nefname.replace('.NEF', '.jpg')}"
-        preview_edit = f"thumbnails/edit/{img_id.nefname.replace('.NEF', '.jpg')}"
+        preview_full = f"thumbnails/edit/{img_id.nefname.replace('.NEF', '.jpg')}"
 
         #check if preview files exist
-        if not Path(preview_crop).exists() or not Path(preview_edit).exists():
+        if not Path(preview_crop).exists() or not Path(preview_full).exists():
             print(f"Warning: preview files for {img_id} do not exist, please export them from Lightroom.")
         f.write(
-            f'| [{img_id}]({img_id.listing}) '\
-            f'| [<img src="{preview_crop}" width="200px"/>]({img_id.listing}) ' \
-            f'| [<img src="{preview_edit}" width="300px"/>]({img_id.listing}) ' \
+            f'| [{img_id}]({img_id.listing} "Link to the image listing") ' \
+            f'| [<img src="{preview_crop}" width="200px"/>]({preview_crop} "Full resolution will be uploaded to Flickr") ' \
+            f'| [<img src="{preview_full}" width="300px"/>]({preview_full} "Full resolution will be uploaded to Flickr") ' \
             f'| TLE Type: {", ".join(types)} <br/><br/> Astronaut: {astronaut} ' \
             f'| [Full resolution]({img_id.fullres}) <br/><br/> [Request Raw]({img_id.raw_request}) |\n'
         )
