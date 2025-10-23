@@ -23,8 +23,17 @@ Reprocessed images from this repository or the Flickr album should additionally 
 
 If you find TLE images on https://eol.jsc.nasa.gov which are not yet on the list, you can contribute them in two ways:
 
-* Send me a message on [Bluesky](https://bsky.app/profile/stim3on.bsky.social) or [Mastodon](https://fosstodon.org/@stim3on)
+* Send me a message on [Bluesky](https://bsky.app/profile/stim3on.bsky.social) or [Mastodon](https://fosstodon.org/@stim3on) or [Email](mailto:simeon[dot]schmauss[at]hm.edu)
 * Open an [Issue](https://github.com/sschmaus/ISS_TLE_observations/issues/new?title=New%20TLE%20observation&body=The%20following%20Astronaut%20image[s]%20contain%20TLEs,%20please%20add%20them%20to%20the%20repository:) with the NASA image id or link
+
+## Acknowledgements
+
+This list of TLE observations was compiled from various sources:
+
+* Manual search on https://eol.jsc.nasa.gov
+* [Jehl et al., “Color Pictures of Sprites from Non-Dedicated Observation on Board the International Space Station.”](https://doi.org/10.1029/2012JA018144)
+* Social media posts from Astronauts
+* Riccardo Rossi and the [AstronautiCAST](https://www.youtube.com/@astronauticast) YouTube channel
 
 ## Table of observations
 

@@ -89,3 +89,6 @@ cython_debug/
 
 # Constants file containing API keys
 resources/constants.py
+
+#ignore temp files
+/temp/*
