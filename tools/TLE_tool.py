@@ -11,41 +11,6 @@ import argparse
 
 
 dirname = Path(__file__).parent
-image_csv = dirname / "image_list.csv"
-images_table = pd.read_csv(image_csv).to_dict(orient="records")
-
-
-def read_image_list():
-    """read image list from CSV and prepare image URLs"""
-    image_list = []
-
-    for line in images_table:
-        img_id = ImageID(line["img_id"])
-
-        types = line["type_of_tle"].split(" ")
-        astronaut = line["astronaut"]
-
-        # download thumbnail if not already present
-        thumb_path = Path(f"thumbnails/unprocessed/{img_id}.JPG")
-
-        if not thumb_path.exists():
-            # download thumbnail
-            download(img_id, thumb_path.parent, img_size="small")
-
-        image_list.append(
-            {
-                "img_id": img_id.__str__(),
-                "astronaut": astronaut,
-                "types": (" ").join(types),
-                "listing": img_id.listing,
-                "small": img_id.small,
-                "large": img_id.large,
-                "raw_request": img_id.raw_request,
-            }
-        )
-
-    return image_list
-
 
 def read_tle_observations():
     """read TLE observations from CSV"""
