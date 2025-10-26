@@ -92,7 +92,8 @@ def update_readme():
         )
         for item in image_list:
             img_id = ImageID(item["img_id"])
-            types = item["types"].split(" ")
+            types = item["types"].strip(" ").split(",")
+            print(types)
             astronaut = (
                 item["astronaut"] if not pd.isna(item["astronaut"]) else "*Unknown*"
             )
@@ -110,7 +111,7 @@ def update_readme():
                 f'| [{img_id}]({img_id.listing} "Link to the image listing") '
                 f'| [<img src="{preview_crop}" width="200px"/>]({preview_crop} "Full resolution will be uploaded to Flickr") '
                 f'| [<img src="{preview_full}" width="300px"/>]({preview_full} "Full resolution will be uploaded to Flickr") '
-                f"| TLE Type: {', '.join(types)} <br/><br/> Astronaut: {astronaut} "
+                f"| TLE Type: {", ".join(types)} <br/><br/> Astronaut: {astronaut} "
                 f"| [Full resolution]({img_id.large}) <br/><br/> [Request Raw]({img_id.raw_request}) |\n"
             )
 
@@ -118,7 +119,7 @@ def cli_add_image():
     """call the add_image function from command line arguments"""
     img_id = ImageID(input("Enter image ID (e.g., ISS029-E-37312): ").strip())
     astronaut = input("Enter astronaut name (or leave blank): ").strip()
-    types_of_tle = input("Enter types of TLE (comma-separated): ").strip().split(",")
+    types_of_tle = input("Enter types of TLE (comma-separated): ").strip(" ").split(",")
     overwrite = input("Overwrite existing entry if present? (y/n): ").strip().lower() == "y"
 
     images_df = read_tle_observations()
